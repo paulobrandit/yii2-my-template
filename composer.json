@@ -41,7 +41,9 @@
         ],
         "post-create-project-cmd": [
             "yii\\composer\\Installer::postCreateProject",
-            "yii\\composer\\Installer::postInstall"
+            "yii\\composer\\Installer::postInstall",
+            "npm install",
+            "gulp build"
         ]
     },
     "extra": {
