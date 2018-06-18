@@ -385,17 +385,21 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-bootstrap4.git",
-                "reference": "1b024afcf17c0f05bec6c7711964cd06a3633eb3"
+                "reference": "5977a083a483f605e1d9260b9d8a56ceb2c6f39f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap4/zipball/1b024afcf17c0f05bec6c7711964cd06a3633eb3",
-                "reference": "1b024afcf17c0f05bec6c7711964cd06a3633eb3",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap4/zipball/5977a083a483f605e1d9260b9d8a56ceb2c6f39f",
+                "reference": "5977a083a483f605e1d9260b9d8a56ceb2c6f39f",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/bootstrap": "~4.1.0",
-                "yiisoft/yii2": "~2.0.15|~2.1.0|~3.0.0"
+                "bower-asset/bootstrap": "~4.0",
+                "yiisoft/yii2": "~2.0|~2.1@dev|~3.0@dev"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*",
+                "yiisoft/yii2-coding-standards": "~2.0"
             },
             "type": "yii2-extension",
             "extra": {
@@ -427,6 +431,10 @@
                     "email": "amigo.cobos@gmail.com"
                 },
                 {
+                    "name": "Simon Karlen",
+                    "email": "simi.albi@gmail.com"
+                },
+                {
                     "name": "Qiang Xue",
                     "email": "qiang.xue@gmail.com",
                     "homepage": "http://www.yiiframework.com/"
@@ -438,7 +446,7 @@
                 "bootstrap4",
                 "yii2"
             ],
-            "time": "2018-06-13T12:48:27+00:00"
+            "time": "2018-06-17T22:47:57+00:00"
         },
         {
             "name": "yiisoft/yii2-composer",
