@@ -2,38 +2,108 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+
+/**
+ * This is the model class for table "user".
+ *
+ * @property int $id
+ * @property string $email
+ * @property string $auth_key
+ * @property string $password_hash
+ * @property string $password_reset_token
+ * @property int $active
+ * @property int $type
+ * @property string $created
+ */
+class User extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $username;
+    const STATUS_INACTIVE = 0;
+    const STATUS_ACTIVE = 1;
+
+    const TYPE_ADMIN = 0;
+    const TYPE_USER = 1;
+
+    public static function getTypeOptions()
+    {
+        return [
+            self::TYPE_ADMIN => 'Administrador',
+            self::TYPE_USER => 'Utilizador',
+        ];
+    }
+
     public $password;
-    public $authKey;
-    public $accessToken;
+    public $password_repeat;
 
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
+    public function getTypeDesc()
+    {
+        $options = self::getTypeOptions();
+        return $options[$this->type];
+    }
 
+    public function getIsActive()
+    {
+        return $this->active == self::STATUS_ACTIVE;
+    }
+
+    public function getIsAdmin()
+    {
+        return $this->type == self::TYPE_ADMIN;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'user';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['email'], 'required'],
+            [['active', 'type'], 'integer'],
+            [['created'], 'safe'],
+            [['email', 'password_hash', 'password_reset_token'], 'string', 'max' => 255],
+            [['auth_key'], 'string', 'max' => 32],
+            [['email'], 'unique'],
+            [['password_reset_token'], 'unique'],
+            [['password', 'password_repeat'], 'string', 'length'=>[6,30]],
+            [['password_repeat'], 'compare', 'compareAttribute' => 'password'],
+            [['active'], 'in', 'range' => [self::STATUS_INACTIVE, self::STATUS_ACTIVE]],
+            [['active'], 'default', 'value' => self::STATUS_ACTIVE],
+            [['type'], 'in', 'range' => [self::TYPE_ADMIN, self::TYPE_USER]],
+            [['type'], 'default', 'value' => self::TYPE_USER],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'email' => 'Email',
+            'auth_key' => 'Auth Key',
+            'password_hash' => 'Password Hash',
+            'password_reset_token' => 'Password Reset Token',
+            'active' => 'Active',
+            'type' => 'Type',
+            'created' => 'Created',
+        ];
+    }
 
     /**
      * {@inheritdoc}
      */
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return static::findOne($id);
     }
 
     /**
@@ -41,30 +111,27 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return static::findOne(['access_token' => $token]);
     }
 
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
     public static function findByUsername($username)
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
+        return static::findOne(['email' => $username]);
+    }
 
-        return null;
+    public function getAuthKey()
+    {
+        return $this->auth_key;
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        return $this->getAuthKey() === $authKey;
+    }
+
+    public function getUsername()
+    {
+        return $this->email;
     }
 
     /**
@@ -76,29 +143,41 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
      * Validates password
      *
      * @param string $password password to validate
-     * @return bool if password provided is valid for current user
+     * @return boolean if password provided is valid for current user
      */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
+    }
+
+    /**
+     * Generates password hash from password and sets it to the model
+     *
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password_hash = Yii::$app->security->generatePasswordHash($password, 8);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->created = new \yii\db\Expression('NOW()');
+                $this->auth_key = \Yii::$app->getSecurity()->generateRandomString();
+            }
+            if (!empty($this->password) && !empty($this->password_repeat)) {
+                $this->setPassword($this->password);
+            }
+            return true;
+        }
+        return false;
     }
 }
