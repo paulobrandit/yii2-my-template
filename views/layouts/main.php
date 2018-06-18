@@ -32,7 +32,7 @@ AppAsset::register($this);
         'brandLabel' => Yii::$app->name,
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
-            'class' => 'navbar-expand-lg navbar-dark bg-dark',
+            'class' => 'navbar-expand-lg navbar-dark bg-dark fixed-top',
         ],
     ]);
     echo Nav::widget([
@@ -68,10 +68,10 @@ AppAsset::register($this);
 </div>
 
 <footer class="footer">
-    <div class="container">
-        <p class="float-left">&copy; My Company <?= date('Y') ?></p>
+    <div class="container text-muted">
+        <span class="float-left">&copy; My Company <?= date('Y') ?></span>
 
-        <p class="float-right"><?= Yii::powered() ?></p>
+        <span class="float-right"><?= Yii::powered() ?></span>
     </div>
 </footer>
 
