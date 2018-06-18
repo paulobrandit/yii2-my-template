@@ -22,6 +22,14 @@ class m180618_141952_create_user_table extends Migration
             'type' => $this->tinyInteger()->notNull()->defaultValue(1),
             'created' => $this->dateTime(),
         ]);
+
+        $this->insert('user', [
+            'email' => 'paulo.mendes@branditgroup.com',
+            'auth_key' => \Yii::$app->getSecurity()->generateRandomString(),
+            'password_hash' => \Yii::$app->security->generatePasswordHash('a12345', 8),
+            'type' => 0,
+            'created' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     /**
