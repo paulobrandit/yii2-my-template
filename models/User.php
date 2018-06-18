@@ -16,7 +16,7 @@ use Yii;
  * @property int $type
  * @property string $created
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
