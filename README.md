@@ -2,7 +2,8 @@
     <a href="https://github.com/yiisoft" target="_blank">
         <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
     </a>
-    <h1 align="center">YII 2 bootstrap4 with scss</h1>
+    <h1 align="center">YII 2 my custom app template</h1>
+    <h2 align="center">It contains bootstrap 4, scss compile out of the box, user class with login and user type</h2>
     <br>
 </p>
 
@@ -20,11 +21,12 @@ features to your application.
 DIRECTORY STRUCTURE
 -------------------
 
-      assets/             contains assets definition
+      assets/             contains assets definition (and scss and js src)
       commands/           contains console commands (controllers)
       config/             contains application configurations
       controllers/        contains Web controller classes
       mail/               contains view files for e-mails
+      migrations/         contains migrations for db
       models/             contains model classes
       runtime/            contains files generated during runtime
       tests/              contains various tests for the basic application
