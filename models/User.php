@@ -135,6 +135,42 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     }
 
     /**
+     * Finds user by password reset token
+     *
+     * @param string $token password reset token
+     *
+     * @return static|null
+     */
+    public static function findByPasswordResetToken($token)
+    {
+        if (!static::isPasswordResetTokenValid($token)) {
+            return null;
+        }
+        
+        return static::findOne([
+            'password_reset_token' => $token,
+            'active' => User::STATUS_ACTIVE,
+        ]);
+    }
+
+    /**
+     * Finds out if password reset token is valid
+     *
+     * @param string $token password reset token
+     *
+     * @return bool
+     */
+    public static function isPasswordResetTokenValid($token)
+    {
+        if (empty($token)) {
+            return false;
+        }
+        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $expire = ArrayHelper::getValue(Yii::$app->params, 'user.passwordResetTokenExpire', 3600);
+        return $timestamp + $expire >= time();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getId()
@@ -164,6 +200,30 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     }
 
     /**
+     * Generates "remember me" authentication key
+     */
+    public function generateAuthKey()
+    {
+        $this->auth_key = Yii::$app->getSecurity()->generateRandomString();
+    }
+
+    /**
+     * Generates new password reset token
+     */
+    public function generatePasswordResetToken()
+    {
+        $this->password_reset_token = Yii::$app->getSecurity()->generateRandomString() . '_' . time();
+    }
+
+    /**
+     * Removes password reset token
+     */
+    public function removePasswordResetToken()
+    {
+        $this->password_reset_token = null;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function beforeSave($insert)
@@ -171,7 +231,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         if (parent::beforeSave($insert)) {
             if ($insert) {
                 $this->created = new \yii\db\Expression('NOW()');
-                $this->auth_key = \Yii::$app->getSecurity()->generateRandomString();
+                $this->generateAuthKey();
             }
             if (!empty($this->password) && !empty($this->password_repeat)) {
                 $this->setPassword($this->password);
