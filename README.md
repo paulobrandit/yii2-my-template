@@ -3,7 +3,7 @@
         <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
     </a>
     <h1 align="center">YII 2 my custom app template</h1>
-    <h2 align="center">It contains bootstrap 4, scss compile out of the box, user class with login and user type</h2>
+    <h2 align="center">It contains bootstrap 4, scss compile out of the box, user class with login, user type, user status and password recovery</h2>
     <br>
 </p>
 
